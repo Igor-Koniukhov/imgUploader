@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/joho/godotenv"
 	"html/template"
+	"imageAploaderS3/clients"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -20,6 +21,12 @@ func main() {
 		log.Println(err)
 	}
 	log.Println("The API has started.")
+	cognitoClient := clients.NewCognitoClient(os.Getenv("S3_REGION"), os.Getenv("CLIENT_ID"))
+	err, result := cognitoClient.SignUp("testemail777@gmail.com", "123456")
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Println("-------------Result: ", result)
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/upload", uploadFileHandler)
 	err = http.ListenAndServe(os.Getenv("PORT"), nil)

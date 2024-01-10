@@ -1,0 +1,27 @@
+{{template "base" .}}
+
+{{define "content"}}
+    <section>
+        <h2>Signup</h2>
+        <div>
+            <form enctype="multipart/form-data" action="/signup" method="post">
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" >
+                </div>
+                <div>
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" >
+                </div>
+                <div>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" >
+                </div>
+                <div>
+                    <button>Sign up</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+{{end}}

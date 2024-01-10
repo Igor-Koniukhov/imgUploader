@@ -1,0 +1,19 @@
+{{template "base" .}}
+
+{{define "content"}}
+    <section>
+        <h2>Hi {{.Name}}! Upload Image to S3</h2>
+        <div>
+            <form enctype="multipart/form-data" action="/upload" method="post">
+                <div>
+                    <label for="file">Choose file to upload</label>
+                    <input type="file" id="file" name="myFile" accept="image/*">
+                </div>
+                <div>
+                    <button>Upload</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+{{end}}

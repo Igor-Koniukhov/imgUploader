@@ -1,0 +1,19 @@
+{{template "base" .}}
+
+{{define "content"}}
+    <section>
+        <h2>Paste the code you received by email.</h2>
+        <div>
+            <form enctype="multipart/form-data" action="/verify" method="post">
+                <div>
+                    <label for="code">Code</label>
+                    <input type="text" id="code" name="code" >
+                </div>
+                <div>
+                    <button>Confirm</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+{{end}}

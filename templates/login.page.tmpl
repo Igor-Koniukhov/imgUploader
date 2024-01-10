@@ -1,0 +1,24 @@
+{{template "base" .}}
+
+{{define "content"}}
+    <section>
+        <h2>Paste the code you received by email.</h2>
+        <div>
+            <form enctype="multipart/form-data" action="/login" method="post">
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" >
+                </div>
+
+                <div>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" >
+                </div>
+                <div>
+                    <button>Sign in</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+{{end}}

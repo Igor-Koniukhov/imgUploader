@@ -23,6 +23,7 @@ func routes(repo *handlers.Repository) http.Handler {
 		r.Use(repo.UserDataSet)
 		r.Get("/", repo.HomePage)
 		r.Post("/upload", repo.UploadFileHandler)
+		r.Get("/user-name", repo.GetUserName)
 	})
 
 	fileServer := http.FileServer(http.Dir("./static"))

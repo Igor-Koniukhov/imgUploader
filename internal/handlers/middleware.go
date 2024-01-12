@@ -9,7 +9,27 @@ import (
 
 func (m *Repository) AuthSet(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("Authorization")
+		cookie, err := r.Cookie("AccessToken")
+		if err != nil {
+			if errors.Is(err, http.ErrNoCookie) {
+				http.Redirect(w, r, "/signup", http.StatusSeeOther)
+				return
+			}
+			http.Error(w, fmt.Sprintf("Error getting cookie: %v", err), http.StatusInternalServerError)
+			return
+		}
+		if cookie.Value == "" {
+			http.Redirect(w, r, "/signup", http.StatusSeeOther)
+			return
+		}
+		r.Header.Set("Authorization", cookie.Value)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (m *Repository) UserDataSet(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("TokenId")
 		if err != nil {
 			if errors.Is(err, http.ErrNoCookie) {
 				http.Redirect(w, r, "/signup", http.StatusSeeOther)
@@ -24,7 +44,6 @@ func (m *Repository) AuthSet(next http.Handler) http.Handler {
 		}
 		res := helpers.GetJWTPayloadData(cookie.Value)
 		m.app.Name = res.Name
-		r.Header.Set("Authorization", cookie.Value)
 		next.ServeHTTP(w, r)
 	})
 }

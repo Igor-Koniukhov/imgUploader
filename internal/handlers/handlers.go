@@ -83,13 +83,28 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if initiateAuthOutput != nil && initiateAuthOutput.AuthenticationResult != nil && initiateAuthOutput.AuthenticationResult.IdToken != nil {
 
-		setToken := &http.Cookie{
-			Name:     "Authorization",
+		accessToken := &http.Cookie{
+			Name:     "AccessToken",
+			Value:    *initiateAuthOutput.AuthenticationResult.AccessToken,
+			HttpOnly: true,
+			SameSite: 0,
+		}
+		refreshToken := &http.Cookie{
+			Name:     "RefreshToken",
+			Value:    *initiateAuthOutput.AuthenticationResult.RefreshToken,
+			HttpOnly: true,
+			SameSite: 0,
+		}
+		tokenId := &http.Cookie{
+			Name:     "TokenId",
 			Value:    *initiateAuthOutput.AuthenticationResult.IdToken,
 			HttpOnly: true,
 			SameSite: 0,
 		}
-		http.SetCookie(w, setToken)
+		fmt.Println(*initiateAuthOutput.AuthenticationResult.AccessToken, "===========")
+		http.SetCookie(w, accessToken)
+		http.SetCookie(w, refreshToken)
+		http.SetCookie(w, tokenId)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }

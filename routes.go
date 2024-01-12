@@ -15,12 +15,13 @@ func routes(repo *handlers.Repository) http.Handler {
 	mux.Post("/signup", repo.Signup)
 	mux.Get("/login", repo.LoginPageHandler)
 	mux.Post("/login", repo.LoginHandler)
+	mux.Get("/verify", repo.VerifyPageHandler)
+	mux.Post("/verify", repo.VerifyHandler)
 
 	mux.Group(func(r chi.Router) {
 		r.Use(repo.AuthSet)
+		r.Use(repo.UserDataSet)
 		r.Get("/", repo.HomePage)
-		r.Get("/verify", repo.VerifyPageHandler)
-		r.Post("/verify", repo.VerifyHandler)
 		r.Post("/upload", repo.UploadFileHandler)
 	})
 

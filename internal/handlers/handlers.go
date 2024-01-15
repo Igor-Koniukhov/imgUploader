@@ -64,7 +64,7 @@ func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/verify", http.StatusSeeOther)
+	http.Redirect(w, r, "/verify", http.StatusOK)
 	return
 }
 
@@ -81,7 +81,7 @@ func (m *Repository) VerifyHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	fmt.Println(result)
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	http.Redirect(w, r, "/login", http.StatusOK)
 }
 
 func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -116,11 +116,10 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			HttpOnly: true,
 			SameSite: 0,
 		}
-		fmt.Println(*initiateAuthOutput.AuthenticationResult.AccessToken, "===========")
 		http.SetCookie(w, accessToken)
 		http.SetCookie(w, refreshToken)
 		http.SetCookie(w, tokenId)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/", http.StatusOK)
 	}
 }
 

@@ -46,9 +46,10 @@ func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	cognitoClient := clients.NewCognitoClient(os.Getenv("S3_REGION"), os.Getenv("CLIENT_ID"))
 	err, _ := cognitoClient.SignUp(email, name, password, birthdateStr)
+
 	if err != nil {
 		log.Println(err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	http.Redirect(w, r, "/verify", http.StatusSeeOther)

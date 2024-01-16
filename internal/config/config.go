@@ -9,4 +9,5 @@ type AppConfig struct {
 	TemplateCache map[string]*template.Template
 	Email         string
 	Name          string
+	Birthdate     string
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"imageAploaderS3/clients"
 	"imageAploaderS3/internal/config"
-	"imageAploaderS3/internal/helpers"
 	"imageAploaderS3/internal/render"
 	"imageAploaderS3/models"
 	"log"
@@ -41,24 +40,12 @@ func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	name := r.FormValue("name")
 	birthdateStr := r.FormValue("birthdate")
-	birthdate, err := helpers.ParseBirthdate(birthdateStr)
-	if err != nil {
-		http.Error(w, "Invalid birthdate format", http.StatusBadRequest)
-		return
-	}
-
-	age := helpers.CalculateAge(birthdate)
-
-	if age < 18 {
-		http.Error(w, "User must be 18 years or older to sign up", http.StatusForbidden)
-		return
-	}
-
 	m.app.Name = name
 	m.app.Email = email
+	m.app.Birthdate = birthdateStr
 	password := r.FormValue("password")
 	cognitoClient := clients.NewCognitoClient(os.Getenv("S3_REGION"), os.Getenv("CLIENT_ID"))
-	err, _ = cognitoClient.SignUp(email, name, password)
+	err, _ := cognitoClient.SignUp(email, name, password, birthdateStr)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

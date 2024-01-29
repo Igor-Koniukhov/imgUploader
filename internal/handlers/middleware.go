@@ -43,7 +43,7 @@ func (m *Repository) UserDataSet(next http.Handler) http.Handler {
 			return
 		}
 		res := helpers.GetJWTPayloadData(cookie.Value)
-		m.app.Name = res.Name
+		m.App.Name = res.Name
 		next.ServeHTTP(w, r)
 	})
 }

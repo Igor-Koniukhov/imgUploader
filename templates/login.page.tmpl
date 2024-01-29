@@ -2,7 +2,7 @@
 
 {{define "content"}}
     <section>
-        <h2>Paste the code you received by email.</h2>
+        <p style="color:red">{{.Error}}</p>
         <div>
             <form enctype="multipart/form-data" action="/login" method="post">
                 <div>

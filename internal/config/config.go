@@ -10,4 +10,5 @@ type AppConfig struct {
 	Email         string
 	Name          string
 	Birthdate     string
+	ErrorMessage  string
 }

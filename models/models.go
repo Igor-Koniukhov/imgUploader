@@ -16,3 +16,12 @@ type JWTPayload struct {
 	Jti             string `json:"jti"`
 	Email           string `json:"email"`
 }
+
+const TableUsers = "users"
+
+type User struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	BirthDate string `json:"birth_date"`
+}

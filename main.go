@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"github.com/joho/godotenv"
+	"imageAploaderS3/driver"
 	"imageAploaderS3/internal/config"
-	"imageAploaderS3/internal/handlers"
 	"imageAploaderS3/internal/render"
 	"log"
 	"net/http"
@@ -15,10 +17,20 @@ var app config.AppConfig
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Println(err)
+		log.Println("Env load error: ", err)
+	}
+	db, err := driver.NewDatabase()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			fmt.Println("Error db connection: ", err)
+		}
+	}(db)
+	if err != nil {
+		log.Println("DB initiation error: ", err)
 	}
 	log.Println("The API has started.")
-	repo := handlers.NewRepository(&app)
+
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache: ", err)
@@ -30,7 +42,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:    os.Getenv("PORT"),
-		Handler: routes(repo),
+		Handler: routes(&app, db),
 	}
 
 	err = srv.ListenAndServe()

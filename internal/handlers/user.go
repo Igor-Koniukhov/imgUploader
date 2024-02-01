@@ -62,6 +62,11 @@ func (m *Repository) AuthPageHandler(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 
 	email := r.FormValue("email")
+	userFromCache, err := m.repo.GetUserFromCacheByEmail(email)
+	if err != nil {
+		fmt.Println("Error getting user from cache: ", err)
+	}
+	m.App.UserInfoFromCache = userFromCache
 	userByEmail, err := m.repo.GetUserByEmail(email)
 	if userByEmail != nil {
 		m.App.ErrorMessage = "User already exists!"
@@ -157,7 +162,10 @@ func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) LoginPageHandler(w http.ResponseWriter, r *http.Request) {
-	err := render.RenderTemplate(w, r, "login.page.tmpl", &models.TemplateData{Error: m.App.ErrorMessage})
+	err := render.RenderTemplate(w, r, "login.page.tmpl", &models.TemplateData{
+		Error:    m.App.ErrorMessage,
+		UserInfo: m.App.UserInfoFromCache,
+	})
 	if err != nil {
 		return
 	}

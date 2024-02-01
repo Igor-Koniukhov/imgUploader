@@ -1,15 +1,16 @@
 module imageAploaderS3
 
-go 1.21
+go 1.21.0
 
 require (
-	github.com/aws/aws-sdk-go v1.49.4
+	github.com/aws/aws-sdk-go v1.50.8
 	github.com/aws/aws-sdk-go-v2/config v1.26.6
 	github.com/aws/aws-sdk-go-v2/feature/rds/auth v1.3.10
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
-	golang.org/x/net v0.17.0
+	github.com/redis/go-redis/v9 v9.4.0
+	golang.org/x/net v0.20.0
 )
 
 require (
@@ -25,5 +26,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.21.7 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.26.7 // indirect
 	github.com/aws/smithy-go v1.19.0 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 )

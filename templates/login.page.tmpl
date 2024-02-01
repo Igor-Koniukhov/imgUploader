@@ -3,6 +3,7 @@
 {{define "content"}}
     <section>
         <p style="color:red">{{.Error}}</p>
+        <p>User data from cache: {{.UserInfo}}</p>
         <div>
             <form enctype="multipart/form-data" action="/login" method="post">
                 <div>

@@ -4,16 +4,17 @@ import (
 	"database/sql"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/redis/go-redis/v9"
 	"imageAploaderS3/internal/config"
 	"imageAploaderS3/internal/handlers"
 	"imageAploaderS3/internal/repository"
 	"net/http"
 )
 
-func routes(app *config.AppConfig, db *sql.DB) http.Handler {
+func routes(app *config.AppConfig, db *sql.DB, primaryRC *redis.Client, readerRC *redis.Client) http.Handler {
 	mux := chi.NewRouter()
 	mux.Use(middleware.Recoverer)
-	dbRepo := repository.NewRepository(db)
+	dbRepo := repository.NewRepository(db, primaryRC, readerRC)
 	repo := handlers.NewHandlers(app, dbRepo)
 
 	mux.Get("/signup", repo.AuthPageHandler)

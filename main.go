@@ -28,6 +28,7 @@ func main() {
 		Password: "",
 		DB:       0,
 	})
+
 	readerRedisClient := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("READER_ENDPOINT"),
 		Password: "",

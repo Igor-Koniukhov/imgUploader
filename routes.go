@@ -14,6 +14,7 @@ import (
 func routes(app *config.AppConfig, db *sql.DB, primaryRC *redis.Client, readerRC *redis.Client) http.Handler {
 	mux := chi.NewRouter()
 	mux.Use(middleware.Recoverer)
+	mux.Use(handlers.XRayMiddleware("MyApp"))
 	dbRepo := repository.NewRepository(db, primaryRC, readerRC)
 	repo := handlers.NewHandlers(app, dbRepo)
 

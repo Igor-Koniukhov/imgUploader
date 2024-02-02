@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-xray-sdk-go/xray"
 	"imageAploaderS3/clients"
 	"imageAploaderS3/internal/config"
 	"imageAploaderS3/internal/render"
@@ -40,6 +42,18 @@ func NewUserHandlers(a *config.AppConfig, repo dbrepo.UserRepository) *Repositor
 	return &Repository{
 		App:  a,
 		repo: repo,
+	}
+}
+
+func XRayMiddleware(appName string) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			segName := appName + " - " + r.Method + " " + r.URL.Path
+			_, seg := xray.BeginSegment(r.Context(), segName)
+
+			next.ServeHTTP(w, r)
+			seg.Close(nil)
+		})
 	}
 }
 
@@ -190,9 +204,14 @@ func (m *Repository) UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}(file)
 
-		sess, _ := session.NewSession(&aws.Config{
+		sess, err := session.NewSession(&aws.Config{
 			Region: aws.String(os.Getenv("S3_REGION")),
 		})
+		if err != nil {
+			fmt.Println(err)
+		}
+		s3Client := s3.New(sess)
+		xray.AWS(s3Client.Client)
 		uploader := s3manager.NewUploader(sess)
 		fileKey := fmt.Sprintf("%s-%s", time.Now().Format("20060102-150405"), handler.Filename)
 

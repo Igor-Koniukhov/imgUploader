@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/rds/auth"
+	"github.com/aws/aws-xray-sdk-go/xray"
 	_ "github.com/lib/pq"
 	"os"
 	"strconv"
@@ -32,12 +33,11 @@ func NewDatabase() (*sql.DB, error) {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s",
 		os.Getenv("DB_HOST"), dbPort, os.Getenv("DB_USER"), authT, os.Getenv("DB_NAME"),
 	)
-	db, err := sql.Open("postgres", dsn)
+	db, err := xray.SQLContext("postgres", dsn)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
-
 	err = db.Ping()
 	if err != nil {
 		fmt.Println(err)

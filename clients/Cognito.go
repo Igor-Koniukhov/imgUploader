@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+	"github.com/aws/aws-xray-sdk-go/xray"
 	"log"
 )
 
@@ -87,6 +88,7 @@ func NewCognitoClient(cognitoRegion string, cognitoAppClientId string) CognitoCl
 		log.Println(err)
 	}
 	client := cognito.New(sess)
+	xray.AWS(client.Client)
 
 	return &awsCognitoClient{
 		cognitoClient: client,

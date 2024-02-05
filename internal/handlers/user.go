@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"imageAploaderS3/clients"
 	"imageAploaderS3/internal/config"
+	"imageAploaderS3/internal/helpers"
 	"imageAploaderS3/internal/render"
 	"imageAploaderS3/internal/repository/dbrepo"
 	"imageAploaderS3/models"
@@ -50,7 +51,21 @@ func XRayMiddleware(appName string) func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			segName := appName + " - " + r.Method + " " + r.URL.Path
 			_, seg := xray.BeginSegment(r.Context(), segName)
-
+			cookie, err := r.Cookie("TokenId")
+			if err != nil {
+				fmt.Println(err)
+			}
+			if err == nil && cookie != nil {
+				res := helpers.GetJWTPayloadData(cookie.Value)
+				err := seg.AddMetadata("UserInfo", map[string]string{
+					"UserName": res.Name,
+					"Email":    res.Email,
+					"UserId":   res.Sub,
+				})
+				if err != nil {
+					fmt.Println("adding metadata error: ", err)
+				}
+			}
 			next.ServeHTTP(w, r)
 			seg.Close(nil)
 		})

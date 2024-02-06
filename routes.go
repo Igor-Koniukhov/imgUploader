@@ -14,9 +14,16 @@ import (
 func routes(app *config.AppConfig, db *sql.DB, primaryRC *redis.Client, readerRC *redis.Client) http.Handler {
 	mux := chi.NewRouter()
 	mux.Use(middleware.Recoverer)
-	mux.Use(handlers.XRayMiddleware("MyApp"))
 	dbRepo := repository.NewRepository(db, primaryRC, readerRC)
 	repo := handlers.NewHandlers(app, dbRepo)
+	mux.Group(func(r chi.Router) {
+		r.Use(repo.AuthSet)
+		r.Use(repo.UserDataSet)
+		r.Use(repo.XRayMiddleware("imgUploader"))
+		r.Get("/", repo.HomePage)
+		r.Post("/upload", repo.UploadFileHandler)
+		r.Get("/user-name", repo.GetUserName)
+	})
 
 	mux.Get("/signup", repo.AuthPageHandler)
 	mux.Post("/signup", repo.Signup)
@@ -24,14 +31,6 @@ func routes(app *config.AppConfig, db *sql.DB, primaryRC *redis.Client, readerRC
 	mux.Post("/login", repo.LoginHandler)
 	mux.Get("/verify", repo.VerifyPageHandler)
 	mux.Post("/verify", repo.VerifyHandler)
-
-	mux.Group(func(r chi.Router) {
-		r.Use(repo.AuthSet)
-		r.Use(repo.UserDataSet)
-		r.Get("/", repo.HomePage)
-		r.Post("/upload", repo.UploadFileHandler)
-		r.Get("/user-name", repo.GetUserName)
-	})
 
 	fileServer := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))

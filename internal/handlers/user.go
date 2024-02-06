@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"imageAploaderS3/clients"
 	"imageAploaderS3/internal/config"
-	"imageAploaderS3/internal/helpers"
 	"imageAploaderS3/internal/render"
 	"imageAploaderS3/internal/repository/dbrepo"
 	"imageAploaderS3/models"
@@ -32,6 +31,7 @@ type User interface {
 	GetUserName(w http.ResponseWriter, r *http.Request)
 	AuthSet(next http.Handler) http.Handler
 	UserDataSet(next http.Handler) http.Handler
+	XRayMiddleware(appName string) func(next http.Handler) http.Handler
 }
 
 type Repository struct {
@@ -43,32 +43,6 @@ func NewUserHandlers(a *config.AppConfig, repo dbrepo.UserRepository) *Repositor
 	return &Repository{
 		App:  a,
 		repo: repo,
-	}
-}
-
-func XRayMiddleware(appName string) func(next http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			segName := appName + " - " + r.Method + " " + r.URL.Path
-			_, seg := xray.BeginSegment(r.Context(), segName)
-			cookie, err := r.Cookie("TokenId")
-			if err != nil {
-				fmt.Println(err)
-			}
-			if err == nil && cookie != nil {
-				res := helpers.GetJWTPayloadData(cookie.Value)
-				err := seg.AddMetadata("UserInfo", map[string]string{
-					"UserName": res.Name,
-					"Email":    res.Email,
-					"UserId":   res.Sub,
-				})
-				if err != nil {
-					fmt.Println("adding metadata error: ", err)
-				}
-			}
-			next.ServeHTTP(w, r)
-			seg.Close(nil)
-		})
 	}
 }
 
@@ -89,14 +63,13 @@ func (m *Repository) AuthPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
-
 	email := r.FormValue("email")
-	userFromCache, err := m.repo.GetUserFromCacheByEmail(email)
+	userFromCache, err := m.repo.GetUserFromCacheByEmail(r.Context(), email)
 	if err != nil {
 		fmt.Println("Error getting user from cache: ", err)
 	}
 	m.App.UserInfoFromCache = userFromCache
-	userByEmail, err := m.repo.GetUserByEmail(email)
+	userByEmail, err := m.repo.GetUserByEmail(r.Context(), email)
 	if userByEmail != nil {
 		m.App.ErrorMessage = "User already exists!"
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -117,7 +90,7 @@ func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if userByEmail == nil {
-		user, _, err := m.repo.CreateUser(&models.User{
+		user, _, err := m.repo.CreateUser(r.Context(), &models.User{
 			Name:      name,
 			Email:     email,
 			BirthDate: birthdateStr,
@@ -242,6 +215,15 @@ func (m *Repository) UploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		time.Sleep(time.Millisecond * 300)
+		user, err := m.repo.GetUserByEmail(r.Context(), m.App.Email)
+		if err != nil {
+			return
+		}
+		url := fmt.Sprintf("%s%s", os.Getenv("SOURCE_URL"), fileKey)
+		_, err = m.repo.SaveUserImgUrl(r.Context(), user.ID, url)
+		if err != nil {
+			return
+		}
 
 		_, err = fmt.Fprintf(w, "Successfully uploaded %s%s\n", os.Getenv("SOURCE_URL"), fileKey)
 		if err != nil {

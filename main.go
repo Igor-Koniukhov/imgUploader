@@ -18,6 +18,7 @@ var app config.AppConfig
 var ctx = context.Background()
 
 func main() {
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Env load error: ", err)
@@ -38,10 +39,9 @@ func main() {
 	pong, err := primaryRedisClient.Ping(ctx).Result()
 	if err != nil {
 		fmt.Println("Error connecting to Redis:", err, pong)
-		return
 	}
 	fmt.Println("Connected to Redis:", pong)
-	db, err := driver.NewDatabase()
+	db, err := driver.NewDatabase(ctx)
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {

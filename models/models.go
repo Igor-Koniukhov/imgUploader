@@ -18,10 +18,17 @@ type JWTPayload struct {
 }
 
 const TableUsers = "users"
+const TableImages = "images"
 
 type User struct {
 	ID        int    `json:"id"`
 	Name      string `json:"name"`
 	Email     string `json:"email"`
 	BirthDate string `json:"birth_date"`
+}
+
+type Image struct {
+	ID     int    `json:"id"`
+	ImgUrl string `json:"img_url"`
+	UserID int    `json:"user_id"`
 }

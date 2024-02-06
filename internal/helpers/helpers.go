@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"imageAploaderS3/models"
 	"strings"
-	"time"
 )
 
 func GetJWTPayloadData(jwt string) *models.JWTPayload {
@@ -30,18 +29,4 @@ func GetJWTPayloadData(jwt string) *models.JWTPayload {
 	}
 
 	return &payloadData
-}
-
-func CalculateAge(birthdate time.Time) int {
-	now := time.Now()
-	years := now.Year() - birthdate.Year()
-	if now.Month() < birthdate.Month() || (now.Month() == birthdate.Month() && now.Day() < birthdate.Day()) {
-		years--
-	}
-	return years
-}
-
-func ParseBirthdate(birthdateStr string) (time.Time, error) {
-	layout := "2006-01-02"
-	return time.Parse(layout, birthdateStr)
 }

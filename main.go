@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	"imageAploaderS3/driver"
@@ -18,7 +19,7 @@ var app config.AppConfig
 var ctx = context.Background()
 
 func main() {
-
+	context.WithValue(ctx, "something", "value888888")
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Env load error: ", err)
@@ -29,7 +30,12 @@ func main() {
 		Password: "",
 		DB:       0,
 	})
-
+	ctx, subSegRedis := xray.BeginSubsegment(ctx, "redis-operation")
+	defer func() {
+		if subSegRedis != nil {
+			subSegRedis.Close(nil)
+		}
+	}()
 	readerRedisClient := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("READER_ENDPOINT"),
 		Password: "",

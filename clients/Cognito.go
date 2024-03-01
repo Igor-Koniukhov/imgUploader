@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
@@ -81,7 +82,13 @@ func (ctx *awsCognitoClient) SignIn(email string, password string) (error, strin
 	return nil, result.String(), result
 }
 
-func NewCognitoClient(cognitoRegion string, cognitoAppClientId string) CognitoClient {
+func NewCognitoClient(ctx context.Context, cognitoRegion string, cognitoAppClientId string) CognitoClient {
+	ctx, subSeg := xray.BeginSubsegment(ctx, "cognito-idp")
+	defer func() {
+		if subSeg != nil {
+			subSeg.Close(nil)
+		}
+	}()
 	conf := &aws.Config{Region: aws.String(cognitoRegion)}
 	sess, err := session.NewSession(conf)
 	if err != nil {

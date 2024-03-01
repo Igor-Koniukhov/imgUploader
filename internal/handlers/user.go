@@ -47,6 +47,7 @@ func NewUserHandlers(a *config.AppConfig, repo dbrepo.UserRepository) *Repositor
 }
 
 func (m *Repository) HomePage(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.Context().Value("newKey"), "from home")
 	err := render.RenderTemplate(w, r, "upload.page.tmpl", &models.TemplateData{
 		Name: m.App.Name,
 	})
@@ -81,7 +82,7 @@ func (m *Repository) Signup(w http.ResponseWriter, r *http.Request) {
 	m.App.Email = email
 	m.App.Birthdate = birthdateStr
 	password := r.FormValue("password")
-	cognitoClient := clients.NewCognitoClient(os.Getenv("S3_REGION"), os.Getenv("CLIENT_ID"))
+	cognitoClient := clients.NewCognitoClient(r.Context(), os.Getenv("S3_REGION"), os.Getenv("CLIENT_ID"))
 	err, _ = cognitoClient.SignUp(email, name, password, birthdateStr)
 
 	if err != nil {
@@ -115,7 +116,7 @@ func (m *Repository) VerifyPageHandler(w http.ResponseWriter, r *http.Request) {
 
 func (m *Repository) VerifyHandler(w http.ResponseWriter, r *http.Request) {
 	code := r.FormValue("code")
-	cognitoClient := clients.NewCognitoClient(os.Getenv("S3_REGION"), os.Getenv("CLIENT_ID"))
+	cognitoClient := clients.NewCognitoClient(r.Context(), os.Getenv("S3_REGION"), os.Getenv("CLIENT_ID"))
 	err, result := cognitoClient.ConfirmSignUp(m.App.Email, code)
 	if err != nil {
 		log.Println(err)
@@ -125,10 +126,9 @@ func (m *Repository) VerifyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) LoginHandler(w http.ResponseWriter, r *http.Request) {
-
 	email := r.FormValue("email")
 	password := r.FormValue("password")
-	cognitoClient := clients.NewCognitoClient(os.Getenv("S3_REGION"), os.Getenv("CLIENT_ID"))
+	cognitoClient := clients.NewCognitoClient(r.Context(), os.Getenv("S3_REGION"), os.Getenv("CLIENT_ID"))
 	err, _, initiateAuthOutput := cognitoClient.SignIn(email, password)
 	if err != nil {
 		log.Println(err)

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/aws/aws-xray-sdk-go/xray"
@@ -77,8 +78,9 @@ func (m *Repository) XRayMiddleware(appName string) func(next http.Handler) http
 					fmt.Println("adding metadata error: ", err)
 				}
 			}
+			newCtx := context.WithValue(ctx, "newKey", "newValue")
 
-			r = r.WithContext(ctx)
+			r = r.WithContext(newCtx)
 			next.ServeHTTP(w, r)
 		})
 	}

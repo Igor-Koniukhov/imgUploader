@@ -5,9 +5,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/redis/go-redis/v9"
-	"imageAploaderS3/internal/config"
-	"imageAploaderS3/internal/handlers"
-	"imageAploaderS3/internal/repository"
+	"imageUploader/internal/config"
+	"imageUploader/internal/handlers"
+	"imageUploader/internal/repository"
 	"net/http"
 )
 

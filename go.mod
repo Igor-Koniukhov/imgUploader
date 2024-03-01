@@ -1,4 +1,4 @@
-module imageAploaderS3
+module imageUploader
 
 go 1.21.0
 

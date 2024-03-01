@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"imageAploaderS3/internal/config"
-	"imageAploaderS3/internal/repository/dbrepo"
+	"imageUploader/internal/config"
+	"imageUploader/internal/repository/dbrepo"
 )
 
 type Handlers struct {

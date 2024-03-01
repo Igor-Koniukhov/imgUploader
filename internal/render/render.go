@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"imageAploaderS3/internal/config"
-	"imageAploaderS3/models"
+	"imageUploader/internal/config"
+	"imageUploader/models"
 	"net/http"
 	"path/filepath"
 )

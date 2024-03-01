@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"imageAploaderS3/models"
+	"imageUploader/models"
 	"strings"
 )
 

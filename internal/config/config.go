@@ -2,7 +2,7 @@ package config
 
 import (
 	"html/template"
-	"imageAploaderS3/models"
+	"imageUploader/models"
 )
 
 type AppConfig struct {

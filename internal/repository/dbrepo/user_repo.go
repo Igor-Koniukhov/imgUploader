@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/net/context"
-	"imageAploaderS3/models"
+	"imageUploader/models"
 	"time"
 )
 

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/aws/aws-xray-sdk-go/xray"
-	"imageAploaderS3/internal/helpers"
+	"imageUploader/internal/helpers"
 	"net/http"
 )
 

@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"github.com/redis/go-redis/v9"
-	"imageAploaderS3/internal/repository/dbrepo"
+	"imageUploader/internal/repository/dbrepo"
 )
 
 type DBRepository struct {
